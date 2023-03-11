@@ -34,3 +34,20 @@ test('create url', () => {
 		}).toString()
 	).toBe('https://example.com/hello?a=b#hello');
 });
+
+test('create url query with null and undefined are ignored', () => {
+	expect(createUrl({ hostname: 'example.com', setQuery: { a: null } }).toString()).toBe(
+		'https://example.com/'
+	);
+	expect(createUrl({ hostname: 'example.com', setQuery: { a: undefined } }).toString()).toBe(
+		'https://example.com/'
+	);
+
+	// With existing query and null and undefined
+	expect(createUrl({ hostname: 'example.com', setQuery: { a: 'b', c: null } }).toString()).toBe(
+		'https://example.com/?a=b'
+	);
+	expect(
+		createUrl({ hostname: 'example.com', setQuery: { a: 'b', c: undefined } }).toString()
+	).toBe('https://example.com/?a=b');
+});

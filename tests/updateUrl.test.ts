@@ -107,3 +107,17 @@ test('update query with array will rewrite array', () => {
 		'https://example.com/?a=d&a=e'
 	);
 });
+
+test('update query with null will remove query', () => {
+	const url = new URL('https://example.com?a=b');
+
+	expect(updateUrl(url)({ updateQuery: { a: null } }).toString()).toBe('https://example.com/');
+});
+
+test('update query with undefined will not change query', () => {
+	const url = new URL('https://example.com?a=b');
+
+	expect(updateUrl(url)({ updateQuery: { a: undefined } }).toString()).toBe(
+		'https://example.com/?a=b'
+	);
+});

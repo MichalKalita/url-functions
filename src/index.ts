@@ -1,4 +1,5 @@
-export type QueryOptions = Record<string, string | string[]>;
+type QueryValue = string | string[] | null | undefined;
+export type QueryOptions = Record<string, QueryValue>;
 
 type URLOptions = {
 	protocol?: string | 'http' | 'https';
@@ -76,7 +77,7 @@ export const updateUrl =
 		return url;
 	};
 
-function setQueryItem(params: URLSearchParams, key: string, value: string | string[]) {
+function setQueryItem(params: URLSearchParams, key: string, value: QueryValue) {
 	if (Array.isArray(value)) {
 		// remove existing values and add new ones
 		params.delete(key);
@@ -84,6 +85,10 @@ function setQueryItem(params: URLSearchParams, key: string, value: string | stri
 			params.append(key, v);
 		});
 	} else {
-		params.set(key, value);
+		if (value === null) {
+			params.delete(key);
+		} else if (value !== undefined) {
+			params.set(key, value);
+		}
 	}
 }
