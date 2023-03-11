@@ -75,3 +75,35 @@ test('update query with existing query with array', () => {
 		'https://example.com/?a=b&a=c&d=e&d=f'
 	);
 });
+
+test('set query and update query', () => {
+	const url = new URL('https://example.com?a=b');
+
+	expect(updateUrl(url)({ setQuery: { c: 'd' }, updateQuery: { e: 'f' } }).toString()).toBe(
+		'https://example.com/?c=d&e=f'
+	);
+});
+
+test('set empty query to remove all and update query', () => {
+	const url = new URL('https://example.com?a=b');
+
+	expect(updateUrl(url)({ setQuery: {}, updateQuery: { e: 'f' } }).toString()).toBe(
+		'https://example.com/?e=f'
+	);
+});
+
+test('set query and update query with array', () => {
+	const url = new URL('https://example.com?a=b');
+
+	expect(
+		updateUrl(url)({ setQuery: { c: ['d'] }, updateQuery: { e: ['f', 'g'] } }).toString()
+	).toBe('https://example.com/?c=d&e=f&e=g');
+});
+
+test('update query with array will rewrite array', () => {
+	const url = new URL('https://example.com?a=b&a=c');
+
+	expect(updateUrl(url)({ updateQuery: { a: ['d', 'e'] } }).toString()).toBe(
+		'https://example.com/?a=d&a=e'
+	);
+});
