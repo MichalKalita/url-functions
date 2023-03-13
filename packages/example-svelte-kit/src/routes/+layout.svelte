@@ -27,3 +27,5 @@
 	<a href={url({ query: { a: array.slice(1) } })}>Remove first</a>
 	<a href={url({ query: { a: array.slice(0, -1) } })}>Remove last</a>
 </div>
+
+<slot />

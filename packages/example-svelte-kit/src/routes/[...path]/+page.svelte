@@ -6,7 +6,7 @@
 	$: url = updateUrl($page.url);
 
 	$: lastPath = $page.url.pathname.split('/').pop() || '';
-	$: nextPath = String.fromCharCode(lastPath.charCodeAt(lastPath.length - 1) + 1);
+	$: nextPath = lastPath ? String.fromCharCode(lastPath.charCodeAt(lastPath.length - 1) + 1) : 'a';
 </script>
 
 <h1>

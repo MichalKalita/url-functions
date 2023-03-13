@@ -116,7 +116,7 @@ export const resolvePath = (previous: string, next: string): string => {
 		return next;
 	}
 
-	if (next.startsWith('../')) {
+	if (next.startsWith('../') || next === '..') {
 		// up level path
 		const parts = pathSegments(next);
 
