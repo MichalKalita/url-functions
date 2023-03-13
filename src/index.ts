@@ -82,12 +82,15 @@ function setQueryItem(params: URLSearchParams, key: string, value: QueryValue) {
 		// remove existing values and add new ones
 		params.delete(key);
 		value.forEach((v) => {
-			params.append(key, v);
+			// Only numbers and non empty strings are allowed
+			if (typeof v === 'number' || (typeof v === 'string' && v.length > 0)) {
+				params.append(key, v);
+			}
 		});
 	} else {
 		if (value === null) {
 			params.delete(key);
-		} else if (value !== undefined) {
+		} else if (value !== undefined || typeof value === 'string' || typeof value === 'number') {
 			params.set(key, value);
 		}
 	}
