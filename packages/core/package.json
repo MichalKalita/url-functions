@@ -2,16 +2,12 @@
   "name": "create-url",
   "version": "1.0.0",
   "description": "",
+  "type": "module",
   "main": "dist/cjs/index.js",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/esm/index.js",
-      "require": "./dist/cjs/index.js"
-    }
-  },
+  "module": "dist/esm/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "build": "rm -rf dist && tsc && tsc --project tsconfig.cjs.json",
+    "build": "rm -rf dist && tsc --project tsconfig.cjs.json && tsc",
     "test": "jest",
     "test:w": "jest --watch"
   },

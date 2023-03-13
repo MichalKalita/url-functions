@@ -1,5 +1,6 @@
-type QueryValue = string | string[] | null | undefined;
-export type QueryOptions = Record<string, QueryValue>;
+type QueryValue = string | number | (string | number)[] | null | undefined;
+type QueryValueFn = (currentValue: string | null) => QueryValue;
+export type QueryOptions = Record<string, QueryValue | QueryValueFn>;
 
 type URLOptions = {
 	protocol?: string | 'http' | 'https';
@@ -84,21 +85,27 @@ export const updateUrl =
 		return url;
 	};
 
-function setQueryItem(params: URLSearchParams, key: string, value: QueryValue) {
-	if (Array.isArray(value)) {
+function setQueryItem(params: URLSearchParams, key: string, value: QueryValue | QueryValueFn) {
+	const realValue = typeof value === 'function' ? value(params.get(key)) : value;
+
+	if (Array.isArray(realValue)) {
 		// remove existing values and add new ones
 		params.delete(key);
-		value.forEach((v) => {
+		realValue.forEach((v) => {
 			// Only numbers and non empty strings are allowed
 			if (typeof v === 'number' || (typeof v === 'string' && v.length > 0)) {
-				params.append(key, v);
+				params.append(key, '' + v);
 			}
 		});
 	} else {
-		if (value === null) {
+		if (realValue === null) {
 			params.delete(key);
-		} else if (value !== undefined || typeof value === 'string' || typeof value === 'number') {
-			params.set(key, value);
+		} else if (
+			realValue !== undefined ||
+			typeof realValue === 'string' ||
+			typeof realValue === 'number'
+		) {
+			params.set(key, '' + realValue);
 		}
 	}
 }
