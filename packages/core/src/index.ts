@@ -4,7 +4,7 @@ export type QueryOptions = Record<string, QueryValue>;
 type URLOptions = {
 	protocol?: string | 'http' | 'https';
 	path?: string;
-	setQuery?: QueryOptions;
+	query?: QueryOptions;
 	hash?: string;
 };
 
@@ -14,7 +14,7 @@ export type CreateUrlOptions = URLOptions & {
 
 export type UpdateUrlOptions = URLOptions & {
 	hostname?: string;
-	updateQuery?: QueryOptions;
+	deleteQuery?: boolean;
 };
 
 export function createUrl(options: CreateUrlOptions): URL {
@@ -26,9 +26,9 @@ export function createUrl(options: CreateUrlOptions): URL {
 	}
 
 	// set query
-	if (options.setQuery) {
+	if (options.query) {
 		const params = new URLSearchParams();
-		Object.entries(options.setQuery).forEach(([key, value]) => setQueryItem(params, key, value));
+		Object.entries(options.query).forEach(([key, value]) => setQueryItem(params, key, value));
 		url.search = params.toString();
 	}
 
@@ -45,6 +45,10 @@ export const updateUrl =
 	(update: UpdateUrlOptions): URL => {
 		const url = new URL(previous); // clone object
 
+		if (update.path) {
+			url.pathname = resolvePath(url.pathname, update.path);
+		}
+
 		// update protocol
 		if (update.protocol) {
 			url.protocol = update.protocol;
@@ -55,21 +59,24 @@ export const updateUrl =
 			url.hostname = update.hostname;
 		}
 
-		// set query
-		if (update.setQuery) {
-			const params = new URLSearchParams();
-			Object.entries(update.setQuery).forEach(([key, value]) => setQueryItem(params, key, value));
-			url.search = params.toString();
+		// remove all query params
+		if (update.deleteQuery && !update.query) {
+			url.search = '';
+		} else if (update.query) {
+			// rewrite all query params
+			if (update.deleteQuery) {
+				const params = new URLSearchParams();
+				Object.entries(update.query).forEach(([key, value]) => setQueryItem(params, key, value));
+				url.search = params.toString();
+			} else {
+				// update existing query params
+				Object.entries(update.query).forEach(([key, value]) =>
+					setQueryItem(url.searchParams, key, value)
+				);
+			}
 		}
 
-		// update query
-		if (update.updateQuery) {
-			Object.entries(update.updateQuery).forEach(([key, value]) =>
-				setQueryItem(url.searchParams, key, value)
-			);
-		}
-
-		// update fragment
+		// update hash
 		if (update.hash) {
 			url.hash = update.hash;
 		}
@@ -95,3 +102,34 @@ function setQueryItem(params: URLSearchParams, key: string, value: QueryValue) {
 		}
 	}
 }
+
+const pathSegments = (path: string): string[] =>
+	path
+		.replace(/^\/|\/$/g, '')
+		.split('/')
+		.filter((i) => i);
+
+// Path with .. on start will be resolved to root
+export const resolvePath = (previous: string, next: string): string => {
+	if (next.startsWith('/')) {
+		// absolute path
+		return next;
+	}
+
+	if (next.startsWith('../')) {
+		// up level path
+		const parts = pathSegments(next);
+
+		// Find how many levels we need to go up
+		let level = 0;
+		while (parts[level] === '..') {
+			level++;
+		}
+
+		// TODO: keep last slash??
+		return '/' + [...pathSegments(previous).slice(0, -level), ...parts.slice(level)].join('/');
+	}
+
+	// Remove / from previous and add next
+	return '/' + [...pathSegments(previous), ...pathSegments(next)].join('/');
+};

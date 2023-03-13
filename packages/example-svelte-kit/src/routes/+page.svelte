@@ -9,7 +9,7 @@
 
 <h1>SvelteKit usage example</h1>
 
-<a href={url({ pathname: '', hash: '', deleteQuery: true })}>Reset all parameters</a>
+<a href={url({ deleteQuery: true, hash: '' })}>Reset all queries and hash</a>
 
 <div>
 	<h2 id="query">Query</h2>
