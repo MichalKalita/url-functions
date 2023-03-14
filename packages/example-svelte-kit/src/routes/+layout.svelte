@@ -9,7 +9,16 @@
 
 <h1>SvelteKit usage example</h1>
 
-<a href={url({ deleteQuery: true, hash: '' })}>Reset all queries and hash</a>
+<a href={url({ clearPreviousQuery: true })}>Reset all queries and hash</a>
+<a href={url({ clearQuery: true })}>Reset all queries and hash</a>
+<a href={url({ clear: true })}>Reset all queries and hash</a>
+
+<a href={url({ keepQuery: false })}>Reset all queries and hash</a>
+
+<a href={url({ extendQuery: false })}>Reset all queries and hash</a>
+<a href={url({ deleteQuery: true })}>Reset all queries and hash</a>
+
+<a href={url({ rewriteQuery: true, query: { key: 'value' } })}>Rewrite query</a>
 
 <div>
 	<h2 id="query">Query</h2>
