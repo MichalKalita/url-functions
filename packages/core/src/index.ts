@@ -111,9 +111,8 @@ function setQueryItem(params: URLSearchParams, key: string, value: QueryValue | 
 	} else if (realValue === null) {
 		params.delete(key);
 	} else if (
-		realValue !== undefined ||
-		typeof realValue === 'string' ||
-		typeof realValue === 'number'
+		realValue !== undefined &&
+		(typeof realValue === 'string' || typeof realValue === 'number')
 	) {
 		params.set(key, '' + realValue);
 	}

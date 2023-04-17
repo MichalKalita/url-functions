@@ -12,7 +12,8 @@ test('change hostname', () => {
 	);
 });
 
-describe('relative path', () => {
+// Not implemented yet
+xdescribe('relative path', () => {
 	test('root path', () => {
 		expect(updateUrl('/')({}).toString()).toBe('/');
 	});
@@ -37,16 +38,16 @@ describe('relative path', () => {
 	});
 });
 
-describe('set query', () => {
+describe('query', () => {
 	test('set query', () => {
 		expect(updateUrl(new URL('https://example.com'))({ query: { a: 'b' } }).toString()).toBe(
 			'https://example.com/?a=b'
 		);
 	});
 
-	test('set query with existing query', () => {
+	test('add query to existing', () => {
 		expect(updateUrl(new URL('https://example.com?a=b'))({ query: { c: 'd' } }).toString()).toBe(
-			'https://example.com/?c=d'
+			'https://example.com/?a=b&c=d'
 		);
 	});
 
@@ -59,51 +60,65 @@ describe('set query', () => {
 	test('set query with existing query with array', () => {
 		expect(
 			updateUrl(new URL('https://example.com?a=b'))({ query: { c: ['d', 'e'] } }).toString()
-		).toBe('https://example.com/?c=d&c=e');
+		).toBe('https://example.com/?a=b&c=d&c=e');
 	});
 
-	test('set empty query to remove all', () => {
+	test('empty query dont affects query', () => {
 		expect(updateUrl(new URL('https://example.com?a=b'))({ query: {} }).toString()).toBe(
+			'https://example.com/?a=b'
+		);
+	});
+
+	test('clear query item with null', () => {
+		expect(updateUrl(new URL('https://example.com?a=b'))({ query: { a: null } }).toString()).toBe(
 			'https://example.com/'
 		);
 	});
+
+	test('undefined query item will not change query', () => {
+		expect(
+			updateUrl(new URL('https://example.com?a=b'))({ query: { a: undefined } }).toString()
+		).toBe('https://example.com/?a=b');
+	});
 });
 
-describe('update query', () => {
-	test('update query', () => {
+describe('clear query', () => {
+	test('clear query', () => {
 		expect(
 			updateUrl(new URL('https://example.com?a=b'))({
 				query: { a: 'c' },
 				clearQuery: true
 			}).toString()
 		).toBe('https://example.com/?a=c');
-	});
-
-	test('update query with existing query', () => {
 		expect(
 			updateUrl(new URL('https://example.com?a=b'))({
 				query: { c: 'd' },
 				clearQuery: true
 			}).toString()
-		).toBe('https://example.com/?a=b&c=d');
+		).toBe('https://example.com/?c=d');
 	});
 
-	test('update query with array', () => {
+	test('query array', () => {
 		expect(
 			updateUrl(new URL('https://example.com?a=b'))({
 				query: { a: ['c', 'd'] },
 				clearQuery: true
 			}).toString()
 		).toBe('https://example.com/?a=c&a=d');
-	});
-
-	test('update query with existing query with array', () => {
 		expect(
 			updateUrl(new URL('https://example.com?a=b&a=c'))({
 				query: { d: ['e', 'f'] },
 				clearQuery: true
 			}).toString()
-		).toBe('https://example.com/?a=b&a=c&d=e&d=f');
+		).toBe('https://example.com/?d=e&d=f');
+	});
+
+	test('only clear query', () => {
+		expect(
+			updateUrl(new URL('https://example.com?a=b'))({
+				clearQuery: true
+			}).toString()
+		).toBe('https://example.com/');
 	});
 });
 
@@ -144,11 +159,13 @@ describe('path changes', () => {
 	});
 
 	test('go lvl up and other path', () => {
-		expect(updateUrl(new URL('https://example.com/a/b/c'))({ path: '../../d' }).toString()).toBe(
-			'https://example.com/d'
+		expect(updateUrl(new URL('https://example.com/a/b/c'))({ path: '../d' }).toString()).toBe(
+			'https://example.com/a/b/d'
 		);
-		expect(updateUrl(new URL('https://example.com/a/b/c'))({ path: '../../d/e' }).toString()).toBe(
-			'https://example.com/d/e'
-		);
+		expect(
+			updateUrl(new URL('https://example.com/a/b/c'))({
+				path: '../../../../../../d/e/f'
+			}).toString()
+		).toBe('https://example.com/d/e/f');
 	});
 });

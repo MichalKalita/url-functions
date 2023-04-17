@@ -9,6 +9,7 @@ test('resolvePath with change level', () => {
 	expect(resolvePath('/a/b/c', '../../../../d')).toBe('/d');
 	expect(resolvePath('/a/b/c', '../../../../d/e')).toBe('/d/e');
 	expect(resolvePath('/a/b/c', '../../../../d/e/f')).toBe('/d/e/f');
+
 	expect(resolvePath('/a/b/c', 'd')).toBe('/a/b/c/d');
 });
 
