@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { updateUrl } from 'create-url';
+	import { url } from '$lib/url';
 
-	$: url = updateUrl($page.url);
 	$: number = Number($page.url.searchParams.get('number')) || 0;
 	$: array = $page.url.searchParams.getAll('a') || [];
 	$: urlQueryObject = Array.from($page.url.searchParams.entries()).reduce((acc, [key, value]) => {
@@ -25,18 +24,11 @@
 	<h1>Examples, how to use with link tools</h1>
 	<div class="actions">
 		<a href="#query">native link with hash</a>
-		<a href={url({ hash: 'query' })}>Generated link with hash</a>
+		<a href={$url({ hash: 'query' })}>Generated link with hash</a>
 
-		<a href={url({ clearPreviousQuery: true })}>Reset all queries and hash</a>
-		<a href={url({ clearQuery: true })}>Reset all queries and hash</a>
-		<a href={url({ clear: true })}>Reset all queries and hash</a>
+		<a href={$url({ clearQuery: true })}>Reset all queries and hash</a>
 
-		<a href={url({ keepQuery: false })}>Reset all queries and hash</a>
-
-		<a href={url({ extendQuery: false })}>Reset all queries and hash</a>
-		<a href={url({ deleteQuery: true })}>Reset all queries and hash</a>
-
-		<a href={url({ rewriteQuery: true, query: { key: 'value' } })}>Rewrite query</a>
+		<a href={$url({ clearQuery: true, query: { key: 'value' } })}>Rewrite query</a>
 	</div>
 
 	<div class="note mt-5">Page parameters <span>{$page.route.id}</span></div>
@@ -50,25 +42,25 @@
 
 		<div class="note mt-5">Number <span>{number}</span></div>
 		<div class="box actions">
-			<a href={url({ query: { number: (n) => Number(n || 0) + 1 } })}>
+			<a href={$url({ query: { number: (n) => Number(n || 0) + 1 } })}>
 				Increment number <span>{'url({ query: { number: (n) => Number(n || 0) + 1 } })'}</span>
 			</a>
-			<a href={url({ query: { number: (n) => Number(n || 0) - 1 } })}>
+			<a href={$url({ query: { number: (n) => Number(n || 0) - 1 } })}>
 				Decrement <span>{'url({ query: { number: (n) => Number(n || 0) - 1 } })'}</span>
 			</a>
 		</div>
 
 		<div class="note mt-5">Array <span>[{array.join(', ')}]</span></div>
 		<div class="box actions">
-			<a href={url({ query: { a: [...array, Number(array.at(-1) || 0) + 1] } })}>
+			<a href={$url({ query: { a: [...array, Number(array.at(-1) || 0) + 1] } })}>
 				Add item to list <span
 					>{'url({ query: { a: [...array, Number(array.at(-1) || 0) + 1] } })'}</span
 				>
 			</a>
-			<a href={url({ query: { a: array.slice(1) } })}>
+			<a href={$url({ query: { a: array.slice(1) } })}>
 				Remove first <span>{'url({ query: { a: array.slice(1) } })'}</span>
 			</a>
-			<a href={url({ query: { a: array.slice(0, -1) } })}>
+			<a href={$url({ query: { a: array.slice(0, -1) } })}>
 				Remove last <span>{'url({ query: { a: array.slice(0, -1) } })'}</span>
 			</a>
 		</div>
