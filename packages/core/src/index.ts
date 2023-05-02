@@ -1,4 +1,4 @@
-type QueryValue = string | number | (string | number)[] | null | undefined;
+type QueryValue = string | number | boolean | (string | number)[] | null | undefined;
 type QueryValueFn = (currentValue: string | null) => QueryValue;
 type HashFn = (currentHash: string) => string;
 export type QueryOptions = Record<string, QueryValue | QueryValueFn>;
@@ -21,10 +21,6 @@ export type UpdateUrlOptions = URLOptions & {
 	 * If true, all previous query params will be removed
 	 */
 	clearQuery?: boolean;
-	/**
-	 * Default: true
-	 */
-	clearHash?: boolean;
 };
 
 export function createUrl(options: CreateUrlOptions): URL {
@@ -89,8 +85,6 @@ export const updateUrl =
 		// update hash
 		if (update.hash) {
 			url.hash = typeof update.hash === 'function' ? update.hash(url.hash) : update.hash;
-		} else if (update.clearHash !== false) {
-			url.hash = '';
 		}
 
 		return url;
@@ -103,17 +97,16 @@ function setQueryItem(params: URLSearchParams, key: string, value: QueryValue | 
 		// remove existing values and add new ones
 		params.delete(key);
 		realValue.forEach((v) => {
-			// Only numbers and non empty strings are allowed
+			// Only numbers and non-empty strings are allowed
 			if (typeof v === 'number' || (typeof v === 'string' && v.length > 0)) {
 				params.append(key, '' + v);
 			}
 		});
-	} else if (realValue === null) {
+	} else if (realValue === false) {
 		params.delete(key);
-	} else if (
-		realValue !== undefined &&
-		(typeof realValue === 'string' || typeof realValue === 'number')
-	) {
+	} else if (realValue === true) {
+		params.set(key, '');
+	} else if (typeof realValue === 'string' || typeof realValue === 'number') {
 		params.set(key, '' + realValue);
 	}
 }

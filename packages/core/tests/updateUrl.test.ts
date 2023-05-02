@@ -69,16 +69,28 @@ describe('query', () => {
 		);
 	});
 
-	test('clear query item with null', () => {
-		expect(updateUrl(new URL('https://example.com?a=b'))({ query: { a: null } }).toString()).toBe(
-			'https://example.com/'
-		);
-	});
-
-	test('undefined query item will not change query', () => {
+	test('undefined and null query item will not change query', () => {
 		expect(
 			updateUrl(new URL('https://example.com?a=b'))({ query: { a: undefined } }).toString()
 		).toBe('https://example.com/?a=b');
+
+		expect(updateUrl(new URL('https://example.com?a=b'))({ query: { a: null } }).toString()).toBe(
+			'https://example.com/?a=b'
+		);
+	});
+
+	test('true set query', () => {
+		expect(
+			updateUrl(new URL('https://example.com'))({ query: { activated: true } }).toString()
+		).toBe('https://example.com/?activated='); // TODO: update to make possible create query parameter without =
+	});
+
+	test('false delete query', () => {
+		expect(
+			updateUrl(new URL('https://example.com/?activated'))({
+				query: { activated: false }
+			}).toString()
+		).toBe('https://example.com/');
 	});
 });
 
@@ -130,12 +142,6 @@ describe('array query', () => {
 				clearQuery: true
 			}).toString()
 		).toBe('https://example.com/?a=d&a=e');
-	});
-
-	test('update query with null will remove query', () => {
-		expect(updateUrl(new URL('https://example.com?a=b'))({ query: { a: null } }).toString()).toBe(
-			'https://example.com/'
-		);
 	});
 
 	test('update query with undefined will not change query', () => {
