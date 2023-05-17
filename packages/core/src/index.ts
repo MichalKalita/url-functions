@@ -1,6 +1,6 @@
 type QueryValue = string | number | boolean | (string | number)[] | null | undefined;
 type QueryValueFn = (currentValue: string | null) => QueryValue;
-type HashFn = (currentHash: string) => string;
+type HashFn = (currentHash: string) => string | number;
 export type QueryOptions = Record<string, QueryValue | QueryValueFn>;
 
 type URLOptions = {
@@ -18,9 +18,9 @@ export type UpdateUrlOptions = URLOptions & {
 	hostname?: string;
 	/**
 	 * Default: false
-	 * If true, all previous query params will be removed
+	 * If true, all query params will be kept
 	 */
-	clearQuery?: boolean;
+	keepQuery?: boolean;
 };
 
 export function createUrl(options: CreateUrlOptions): URL {
@@ -33,14 +33,15 @@ export function createUrl(options: CreateUrlOptions): URL {
 
 	// set query
 	if (options.query) {
-		Object.entries(options.query).forEach(([key, value]) =>
-			setQueryItem(url.searchParams, key, value)
-		);
+		Object.entries(options.query).forEach(([key, value]) => {
+			const realValue = unwrapQueryValue(url.searchParams, key, value);
+			setQueryItem(url.searchParams, key, realValue);
+		});
 	}
 
 	// set fragment
 	if (options.hash) {
-		url.hash = typeof options.hash === 'function' ? options.hash(url.hash) : options.hash;
+		url.hash = typeof options.hash === 'function' ? '' + options.hash(url.hash) : options.hash;
 	}
 
 	return url;
@@ -66,33 +67,46 @@ export const updateUrl =
 		}
 
 		// remove all query params
-		if (update.clearQuery && !update.query) {
+		if (!update.keepQuery && !update.query) {
 			url.search = '';
 		} else if (update.query) {
 			// rewrite all query params
-			if (update.clearQuery) {
+			if (!update.keepQuery) {
 				const params = new URLSearchParams();
-				Object.entries(update.query).forEach(([key, value]) => setQueryItem(params, key, value));
+				Object.entries(update.query).forEach(([key, value]) => {
+					// Real value is read from original query parameters, not new empty ones
+					const realValue = unwrapQueryValue(url.searchParams, key, value);
+					setQueryItem(params, key, realValue);
+				});
 				url.search = params.toString();
 			} else {
 				// update existing query params
-				Object.entries(update.query).forEach(([key, value]) =>
-					setQueryItem(url.searchParams, key, value)
-				);
+				Object.entries(update.query).forEach(([key, value]) => {
+					const realValue = unwrapQueryValue(url.searchParams, key, value);
+					setQueryItem(url.searchParams, key, realValue);
+				});
 			}
 		}
 
 		// update hash
 		if (update.hash) {
-			url.hash = typeof update.hash === 'function' ? update.hash(url.hash) : update.hash;
+			url.hash =
+				typeof update.hash === 'function' ? '' + update.hash(url.hash.slice(1)) : update.hash;
+		} else {
+			// Hash is always removed if not set
+			url.hash = '';
 		}
 
 		return url;
 	};
 
-function setQueryItem(params: URLSearchParams, key: string, value: QueryValue | QueryValueFn) {
-	const realValue = typeof value === 'function' ? value(params.get(key)) : value;
+const unwrapQueryValue = (
+	params: URLSearchParams,
+	key: string,
+	value: QueryValue | QueryValueFn
+): QueryValue => (typeof value === 'function' ? value(params.get(key)) : value);
 
+export const setQueryItem = (params: URLSearchParams, key: string, realValue: QueryValue) => {
 	if (Array.isArray(realValue)) {
 		// remove existing values and add new ones
 		params.delete(key);
@@ -109,7 +123,7 @@ function setQueryItem(params: URLSearchParams, key: string, value: QueryValue | 
 	} else if (typeof realValue === 'string' || typeof realValue === 'number') {
 		params.set(key, '' + realValue);
 	}
-}
+};
 
 const pathSegments = (path: string): string[] =>
 	path
