@@ -1,7 +1,14 @@
 {
 	"name": "url-functions",
 	"version": "1.0.0",
-	"description": "",
+	"description": "Wrapper for URL object in functional style",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/MichalKalita/url-functions.git",
+		"directory": "packages/core"
+	},
+	"keywords": ["url", "functional"],
 	"type": "module",
 	"main": "dist/cjs/index.js",
 	"module": "dist/esm/index.js",
@@ -11,9 +18,6 @@
 		"test": "jest",
 		"test:w": "jest --watch"
 	},
-	"keywords": [],
-	"author": "",
-	"license": "MIT",
 	"devDependencies": {
 		"@types/jest": "^29.4.0",
 		"@types/node": "^18.15.0",
