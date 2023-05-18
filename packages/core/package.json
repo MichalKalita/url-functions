@@ -1,6 +1,6 @@
 {
 	"name": "url-functions",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Wrapper for URL object in functional style",
 	"license": "MIT",
 	"repository": {
