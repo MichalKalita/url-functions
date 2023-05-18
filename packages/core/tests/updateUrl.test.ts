@@ -120,6 +120,15 @@ describe('query', () => {
 		).toBe('https://example.com/');
 	});
 
+	test('false delete query with keepQuery', () => {
+		expect(
+			updateUrl(new URL('https://example.com/?activated&a=b'))({
+				query: { activated: false },
+				keepQuery: true
+			}).toString()
+		).toBe('https://example.com/?a=b');
+	});
+
 	describe.each([true, false])('query functions, keepQuery = %s', (keepQuery) => {
 		test('ident function keep value', () => {
 			expect(

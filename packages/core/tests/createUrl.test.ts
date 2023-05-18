@@ -88,3 +88,23 @@ test('create url with invalid query with empty array items will be ignored', () 
 		'https://example.com/'
 	);
 });
+
+describe('query', () => {
+	test('update function have null input', () => {
+		const updateFunction = jest.fn((value) => value);
+		expect(createUrl({ hostname: 'example.com', query: { a: updateFunction } }).toString()).toBe(
+			'https://example.com/'
+		);
+		expect(updateFunction).toBeCalledWith(null);
+	});
+});
+
+describe('hash', () => {
+	test('update function have empty string input', () => {
+		const updateFunction = jest.fn((value) => value);
+		expect(createUrl({ hostname: 'example.com', hash: updateFunction }).toString()).toBe(
+			'https://example.com/'
+		);
+		expect(updateFunction).toBeCalledWith('');
+	});
+});
