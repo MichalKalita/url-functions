@@ -106,7 +106,7 @@ const unwrapQueryValue = (
 	value: QueryValue | QueryValueFn
 ): QueryValue => (typeof value === 'function' ? value(params.get(key)) : value);
 
-export const setQueryItem = (params: URLSearchParams, key: string, realValue: QueryValue) => {
+const setQueryItem = (params: URLSearchParams, key: string, realValue: QueryValue) => {
 	if (Array.isArray(realValue)) {
 		// remove existing values and add new ones
 		params.delete(key);

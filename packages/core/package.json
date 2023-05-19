@@ -1,26 +1,49 @@
 {
 	"name": "url-functions",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"description": "Wrapper for URL object in functional style",
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/MichalKalita/url-functions.git",
-		"directory": "packages/core"
+		"url": "https://github.com/MichalKalita/url-functions",
+		"directory": "packages/url-functions"
 	},
-	"keywords": ["url", "functional"],
+	"keywords": [
+		"url",
+		"functional"
+	],
 	"type": "module",
-	"main": "dist/cjs/index.js",
-	"module": "dist/esm/index.js",
+	"exports": {
+		"./package.json": "./package.json",
+		".": {
+			"types": "./dist/index.d.ts",
+			"browser": "./dist/browser.js",
+			"import": "./dist/esm/index.js",
+			"require": "./dist/cjs/index.cjs"
+		}
+	},
 	"types": "dist/index.d.ts",
+	"sideEffects": false,
 	"scripts": {
-		"build": "rm -rf dist && tsc --project tsconfig.cjs.json && tsc",
+		"build": "rm -rf dist && npm run build:types && npm run build:cjs && npm run build:esm && npm run build:browser && npm run build:browser:min",
+		"build:types": "tsc --emitDeclarationOnly",
+		"build:cjs": "esbuild src/index.ts --bundle --outfile=dist/cjs/index.cjs --platform=node --target=node14 --format=cjs",
+		"build:esm": "esbuild src/index.ts --bundle --outfile=dist/esm/index.js --platform=node --target=node14 --format=esm",
+		"build:browser": "esbuild src/index.ts --bundle --outfile=dist/browser.js --sourcemap --platform=browser --global-name=UrlFunctions",
+		"build:browser:min": "esbuild src/index.ts --bundle --outfile=dist/browser.min.js --minify --sourcemap --platform=browser --global-name=UrlFunctions",
 		"test": "jest",
 		"test:w": "jest --watch"
 	},
+	"files": [
+		"dist",
+		"src",
+		"README.md",
+		"package.json"
+	],
 	"devDependencies": {
 		"@types/jest": "^29.4.0",
 		"@types/node": "^18.15.0",
+		"esbuild": "^0.17.19",
 		"jest": "^29.5.0",
 		"prettier": "^2.8.4",
 		"ts-jest": "^29.0.5",

@@ -11,6 +11,8 @@ Internally is used native URL class and URLQueryParams class.
 npm i url-functions
 ```
 
+Browser build is also available. You can load it from `https://www.unpkg.com/url-functions/dist/browser.min.js`. Functions are available in global variable `UrlFunctions` (`UrlFunctions.updateUrl`, `UrlFunctions.createUrl`).
+
 ## Usage
 
 ### updateUrl
