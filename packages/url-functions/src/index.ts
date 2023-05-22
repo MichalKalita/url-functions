@@ -155,3 +155,10 @@ export const resolvePath = (previous: string, next: string): string => {
 	// Remove / from previous and add next
 	return '/' + [...pathSegments(previous), ...pathSegments(next)].join('/');
 };
+
+// Library will be importable as `import UrlFunctions from 'url-functions'`
+export default {
+	createUrl,
+	updateUrl,
+	resolvePath
+};
