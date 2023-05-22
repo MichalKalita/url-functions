@@ -19,7 +19,6 @@
 		"./package.json": "./package.json",
 		".": {
 			"types": "./dist/index.d.ts",
-			"browser": "./dist/browser.js",
 			"import": "./dist/esm/index.js",
 			"require": "./dist/cjs/index.cjs"
 		}
